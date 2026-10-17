@@ -1117,7 +1117,6 @@ class Qwen3TTSTalkerCodePredictorModel(Qwen3TTSPreTrainedModel):
                 "config": self.config,
                 "inputs_embeds": inputs_embeds,  # transformers>=5 rename
                 "attention_mask": attention_mask,
-                "cache_position": cache_position,
                 "past_key_values": past_key_values,
             }
             # Create the masks
@@ -1531,7 +1530,6 @@ class Qwen3TTSTalkerModel(Qwen3TTSTalkerTextPreTrainedModel):
             config=self.config,
             inputs_embeds=inputs_embeds,  # transformers>=5 rename
             attention_mask=attention_mask,
-            cache_position=cache_position,
             past_key_values=past_key_values,
             position_ids=text_position_ids,
         )
