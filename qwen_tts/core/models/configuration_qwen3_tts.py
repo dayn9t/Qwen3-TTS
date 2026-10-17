@@ -245,9 +245,6 @@ class Qwen3TTSTalkerCodePredictorConfig(PretrainedConfig):
         # transformers>=5: 'default' rope key removed(identity = no scaling)
         if self.rope_scaling and self.rope_scaling.get("rope_type") == "default":
             self.rope_scaling = None
-        # transformers>=5: 'default' rope key removed(identity = no scaling)
-        if self.rope_scaling and self.rope_scaling.get("rope_type") == "default":
-            self.rope_scaling = None
         rope_config_validation(self)
 
         self.layer_types = layer_types
@@ -437,9 +434,6 @@ class Qwen3TTSTalkerConfig(PretrainedConfig):
         # BC: if there is a 'type' field, move it to 'rope_type'.
         if self.rope_scaling is not None and "type" in self.rope_scaling:
             self.rope_scaling["rope_type"] = self.rope_scaling["type"]
-        # transformers>=5: 'default' rope key removed(identity = no scaling)
-        if self.rope_scaling and self.rope_scaling.get("rope_type") == "default":
-            self.rope_scaling = None
 
         if code_predictor_config is None:
             code_predictor_config = {}
