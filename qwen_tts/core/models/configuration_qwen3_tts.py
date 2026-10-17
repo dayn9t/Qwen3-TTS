@@ -391,6 +391,9 @@ class Qwen3TTSTalkerConfig(PretrainedConfig):
         num_code_groups=32,
         text_hidden_size=2048,
         codec_eos_token_id=4198,
+        # transformers>=5: PretrainedConfig no longer defaults token-id attrs;
+        # embedding padding_idx (modeling 1021/1433) reads this at build time.
+        pad_token_id=None,
         codec_think_id=4202,
         codec_nothink_id=4203,
         codec_think_bos_id=4204,
