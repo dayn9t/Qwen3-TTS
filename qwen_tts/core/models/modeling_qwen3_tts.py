@@ -308,6 +308,23 @@ class SqueezeExcitationRes2NetBlock(nn.Module):
         return hidden_state + residual
 
 
+def _compute_default_rope_parameters(config: object, device: object, **kwargs: object):
+    """4.57 identity RoPE init(transformers>=5 removed;recreated for compat)."""
+    import torch
+
+    cfg = config
+    base = getattr(cfg, "rope_theta", 10000.0)
+    head_dim = getattr(cfg, "head_dim", None) or cfg.hidden_size // cfg.num_attention_heads  # type: ignore[attr-defined]
+    dim = int(head_dim * getattr(cfg, "partial_rotary_factor", 1.0))
+    return (
+        1.0 / (base ** (torch.arange(0, dim, 2, dtype=torch.int64).float().to(device) / dim)),
+        1.0,
+    )
+
+
+ROPE_INIT_FUNCTIONS.setdefault("default", _compute_default_rope_parameters)
+
+
 class Qwen3TTSSpeakerEncoder(torch.nn.Module):
     """An implementation of the speaker embedding model in a paper.
     "ECAPA-TDNN: Emphasized Channel Attention, Propagation and Aggregation in
@@ -530,9 +547,7 @@ class Qwen3TTSTalkerRotaryEmbedding(nn.Module):
         if hasattr(config, "rope_scaling") and config.rope_scaling is not None:
             self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
-            # transformers>=5: 'default' removed from ROPE_INIT_FUNCTIONS;
-            # 'dynamic' with no rope_scaling == identity standard rope.
-            self.rope_type = "dynamic" if "default" not in ROPE_INIT_FUNCTIONS else "default"
+            self.rope_type = "default"  # identity init shim registered below(transformers>=5)
         self.max_seq_len_cached = config.max_position_embeddings
         self.original_max_seq_len = config.max_position_embeddings
 
@@ -567,9 +582,7 @@ class Qwen3TTSRotaryEmbedding(nn.Module):
         if hasattr(config, "rope_scaling") and config.rope_scaling is not None:
             self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
-            # transformers>=5: 'default' removed from ROPE_INIT_FUNCTIONS;
-            # 'dynamic' with no rope_scaling == identity standard rope.
-            self.rope_type = "dynamic" if "default" not in ROPE_INIT_FUNCTIONS else "default"
+            self.rope_type = "default"  # identity init shim registered below(transformers>=5)
         self.max_seq_len_cached = config.max_position_embeddings
         self.original_max_seq_len = config.max_position_embeddings
 
