@@ -1115,7 +1115,7 @@ class Qwen3TTSTalkerCodePredictorModel(Qwen3TTSPreTrainedModel):
             # Prepare mask arguments
             mask_kwargs = {
                 "config": self.config,
-                "input_embeds": inputs_embeds,
+                "inputs_embeds": inputs_embeds,  # transformers>=5 rename
                 "attention_mask": attention_mask,
                 "cache_position": cache_position,
                 "past_key_values": past_key_values,
