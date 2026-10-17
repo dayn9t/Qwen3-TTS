@@ -252,7 +252,9 @@ class Qwen3TTSTokenizerV2DecoderRotatoryEmbedding(nn.Module):
         if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
             self.rope_type = config.rope_scaling.get("rope_type", config.rope_scaling.get("type"))
         else:
-            self.rope_type = "default"
+            # transformers>=5: 'default' removed from ROPE_INIT_FUNCTIONS;
+            # 'dynamic' with no rope_scaling == identity standard rope.
+            self.rope_type = "dynamic" if "default" not in ROPE_INIT_FUNCTIONS else "default"
         self.max_seq_len_cached = config.max_position_embeddings
         self.original_max_seq_len = config.max_position_embeddings
 
