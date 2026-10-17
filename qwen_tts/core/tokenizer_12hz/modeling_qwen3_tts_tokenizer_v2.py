@@ -164,11 +164,12 @@ def _compute_default_rope_parameters(config: object, device: object = None, **kw
     base = getattr(cfg, "rope_theta", 10000.0)
     head_dim = getattr(cfg, "head_dim", None) or cfg.hidden_size // cfg.num_attention_heads  # type: ignore[attr-defined]
     dim = int(head_dim * getattr(cfg, "partial_rotary_factor", 1.0))
-    return (
-        1.0
-        / (base ** (torch.arange(0, dim, 2, dtype=torch.int64).float().to(device or "cpu") / dim)),
-        1.0,
-    )
+    # CPU 物化再搬移——init_empty_weights(meta)上下文中裸 arange 会落在 meta 设备,
+    # 复制出 meta 即 NotImplementedError;显式 cpu 创建不受该上下文影响。
+    inv = torch.arange(0, dim, 2, dtype=torch.int64, device="cpu").float()
+    if device is not None:
+        inv = inv.to(device)
+    return 1.0 / (base ** (inv / dim)), 1.0
 
 
 ROPE_INIT_FUNCTIONS.setdefault("default", _compute_default_rope_parameters)
