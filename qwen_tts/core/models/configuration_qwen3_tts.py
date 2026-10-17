@@ -443,6 +443,7 @@ class Qwen3TTSTalkerConfig(PretrainedConfig):
         self.num_code_groups = num_code_groups
         self.text_hidden_size = text_hidden_size
         self.codec_eos_token_id = codec_eos_token_id
+        self.pad_token_id = pad_token_id  # transformers>=5: attr default dropped,须显式落位
         self.codec_think_id = codec_think_id
         self.codec_language_id = codec_language_id
         self.codec_nothink_id = codec_nothink_id
